@@ -1,4 +1,6 @@
 require("dotenv").config();
+// Local service credentials are deliberately separated from shared settings.
+require("dotenv").config({ path: ".env.duffel.local", override: true });
 
 const express = require("express");
 const app = express();
@@ -61,12 +63,14 @@ const authRoute = require("./routes/auth");
 const bookedFlightRoute = require("./routes/BookedFlight");
 const bookedHotelRoute = require("./routes/BookedHotel");
 const flightController = require("./controllers/flightController/flight.controller");
+const aiRoute = require("./routes/ai");
 
 app.use("/hotels", hotelController);
 app.use("/auth", authRoute);
 app.use("/bookings", bookedFlightRoute);
 app.use("/bookings", bookedHotelRoute);
 app.use("/flights", flightController);
+app.use("/ai", aiRoute);
 
 app.use(errorHandler);
 

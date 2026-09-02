@@ -15,6 +15,19 @@ const UserSchema = new mongoose.Schema(
     phone: { type: String, required: true },
     mobile_number: { type: String },
     refreshTokens: [{ type: String }],
+    preferences: {
+      preferredCurrency: { type: String, default: "INR", uppercase: true, trim: true },
+      dietaryRestrictions: { type: [String], default: [] },
+      seatPreference: { type: String, enum: ["window", "aisle", "middle"] },
+      hotelAmenities: { type: [String], default: [] },
+      transportPreferences: { type: [String], default: [] },
+      interests: { type: [String], default: [] },
+      updatedAt: { type: Date },
+    },
+    savedItineraries: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+    },
   },
   { versionKey: false, timestamps: true }
 );

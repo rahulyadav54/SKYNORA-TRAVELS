@@ -1,0 +1,52 @@
+
+> make-my-trip@0.1.0 start
+> react-scripts start
+
+(node:3056) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+(node:3056) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:3056) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled with warnings.
+
+Warning
+(153:5) autoprefixer: end value has mixed support, consider using flex-end instead
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+assets by path [1m[32mstatic/[39m[22m 9.76 MiB
+  assets by path [1m[32mstatic/media/*.png[39m[22m 1.36 MiB
+    asset [1m[32mstatic/media/img1.d7b44be7f407fce0b87b.png[39m[22m 1.02 MiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: src/imgs/img1.png] (auxiliary name: main)
+    asset [1m[32mstatic/media/img.0b5aec014020add2d563.png[39m[22m 165 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: src/imgs/img.png] (auxiliary name: main)
+    asset [1m[32mstatic/media/promo.9bd86a4046b285aa64a0.png[39m[22m 138 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: src/imgs/promo.png] (auxiliary name: main)
+    asset [1m[32mstatic/media/payment.e372ea1ab05a6760ffe1.png[39m[22m 40.1 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: src/imgs/payment.png] (auxiliary name: main)
+  asset [1m[32mstatic/js/bundle.js[39m[22m 8.39 MiB [1m[32m[emitted][39m[22m (name: main) 1 related asset
+  asset [1m[32mstatic/media/mapimg.f9779ccbf6cc2236cba1.jpg[39m[22m 10.4 KiB [1m[32m[emitted][39m[22m [1m[32m[immutable][39m[22m [from: src/images/mapimg.jpg] (auxiliary name: main)
+asset [1m[32mindex.html[39m[22m 2.48 KiB [1m[32m[emitted][39m[22m
+asset [1m[32masset-manifest.json[39m[22m 580 bytes [1m[32m[emitted][39m[22m
+cached modules 13.1 MiB (javascript) 1.37 MiB (asset) [1m[32m[cached][39m[22m 11581 modules
+runtime modules 29.4 KiB 15 modules
+./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js![1m./src/CSS/CarousalUI.css[39m[22m 10.3 KiB [1m[33m[built][39m[22m [1m[33m[1 warning][39m[22m
+
+[1m[33mWARNING[39m[22m in [1m./src/CSS/CarousalUI.css[39m[22m (./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[5].use[2]!./node_modules/source-map-loader/dist/cjs.js!./src/CSS/CarousalUI.css)
+[1mModule Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+Warning
+
+(153:5) autoprefixer: end value has mixed support, consider using flex-end instead[39m[22m
+ @ ./src/CSS/CarousalUI.css 8:6-276 22:17-24 26:7-21 58:25-39 59:36-47 59:50-64 63:6-73:7 64:54-65 64:68-82 70:42-53 70:56-70 72:21-28 83:0-246 83:0-246 84:22-29 84:33-47 84:50-64 61:4-74:5
+ @ ./src/Components/CarousalUI.js 10:0-31
+ @ ./src/features/Home/Home.jsx 8:0-57 58:39-49
+ @ ./src/AllRoutes/AllRoutes.jsx 10:0-45 22:36-40
+ @ ./src/App.js 7:0-50 30:35-44
+ @ ./src/index.js 7:0-24 19:39-42
+
+webpack 5.70.0 compiled with [1m[33m1 warning[39m[22m in 13600 ms
+Watchpack Error (initial scan): Error: EINVAL: invalid argument, lstat 'C:\DumpStack.log.tmp'
+Watchpack Error (initial scan): Error: EINVAL: invalid argument, lstat 'C:\hiberfil.sys'
+Watchpack Error (initial scan): Error: EINVAL: invalid argument, lstat 'C:\pagefile.sys'
+Watchpack Error (initial scan): Error: EINVAL: invalid argument, lstat 'C:\swapfile.sys'

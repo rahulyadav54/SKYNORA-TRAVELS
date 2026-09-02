@@ -10,6 +10,8 @@ import { Profile } from "../features/Profile/Profile";
 import { Trips } from "../features/Trips/Trips";
 import ProductPage from "../HotelsSecondPage/ProductPage";
 import Review from "../ReviewBooking/Review";
+import { AIChat } from "../features/AIChat/AIChat";
+
 export const AllRoutes = () => {
   return (
     <Routes>
@@ -23,6 +25,7 @@ export const AllRoutes = () => {
       <Route path="/hotels/:id" element={<Hotel />} />
       <Route path="/hotels" element={<ProductPage />} />
       <Route path="/hotels/review/:id" element={<Review />} />
+      <Route path="/ai-travel" element={<AIChat />} />
     </Routes>
   );
 };

@@ -10,6 +10,7 @@ import LocalTaxiIcon from "@mui/icons-material/LocalTaxi";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import DownhillSkiingIcon from "@mui/icons-material/DownhillSkiing";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import Login from "./Login";
@@ -23,6 +24,7 @@ const Navbar = ({ isUserLoggedIn, user }) => {
   const [open, setOpen] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const navigate = useNavigate();
+  const handleClickAI = () => navigate('/ai-travel');
   const handleClickFlight = () => navigate('/flights');
   const handleClickHotels = () => navigate('/hotels');
   console.log("user is logged in? ", isUserLoggedIn)
@@ -61,6 +63,14 @@ const Navbar = ({ isUserLoggedIn, user }) => {
           >
             {/* icons container */}
             <div className={styles.iconWrapper}>
+              <div onClick={handleClickAI} style={{ background: "rgba(56, 189, 248, 0.15)", borderRadius: "8px", border: "1px solid rgba(56, 189, 248, 0.4)" }}>
+                <span>
+                  <AutoAwesomeIcon
+                    style={{ fontSize: 30, padding: 4, color: "#38bdf8" }}
+                  ></AutoAwesomeIcon>
+                </span>
+                <p style={{ marginTop: "0px", color: "#38bdf8", fontWeight: "bold" }}>AI Agent</p>
+              </div>
               <div onClick={handleClickFlight}>
                 <span>
                   <FlightIcon
