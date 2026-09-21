@@ -4,6 +4,7 @@ import flightBookingReducer from "../features/flightBookingComponents/flightBook
 import { authReducer } from "../features/auth/auth.reducer";
 import hotelReducer from "../HotelsSecondPage/hotelSlice";
 import hotelBookingReducer from "../features/Hotel/hotelBooking";
+import aiBookingReducer from "../features/AIChat/aiBookingSlice";
 import localStorageMiddleware from "../middleware/localStorageMiddleware";
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     flight: flightReducer,
     flightBooking: flightBookingReducer,
     hotelBooking: hotelBookingReducer,
+    aiBooking: aiBookingReducer,
     auth: authReducer,
     hotel: hotelReducer,
   },

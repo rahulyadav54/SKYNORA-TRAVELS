@@ -3,7 +3,9 @@
  */
 
 import { ConversationSession, ToolCallRecord, ConversationMessage } from "../types/session";
-import { Constraint, TripPlan } from "../types/trip";
+import { Constraint, TripPlan, DayPlan, BudgetSummary, FlightOption, HotelOption } from "../types/trip";
+import { isDataUnavailable } from "../types/results";
+import { extractMapPins } from "./map-pins";
 
 export function createNewSession(userId: string): ConversationSession {
   const id = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -86,4 +88,64 @@ export function buildMessageHistory(
     .filter((m) => m.role === "user" || m.role === "assistant")
     .slice(-20) // last 20 turns for context window management
     .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+}
+
+/** Merge successful tool outputs into the session trip plan */
+export function applyToolResultToSession(
+  session: ConversationSession,
+  toolName: string,
+  output: unknown
+): ConversationSession {
+  if (isDataUnavailable(output)) return session;
+
+  const now = new Date().toISOString();
+  const tripPlan = session.tripPlan ?? createTripPlan(session, session.constraints);
+  const result = output as Record<string, unknown>;
+
+  switch (toolName) {
+    case "search_flights":
+      if (Array.isArray(result.flights)) {
+        tripPlan.flights = result.flights as FlightOption[];
+      }
+      break;
+    case "search_hotels":
+      if (Array.isArray(result.hotels)) {
+        tripPlan.hotels = result.hotels as HotelOption[];
+      }
+      break;
+    case "build_itinerary":
+    case "adapt_itinerary":
+      if (Array.isArray(result.days)) {
+        tripPlan.itinerary = result.days as DayPlan[];
+        tripPlan.status = "modified";
+      }
+      break;
+    case "calculate_budget":
+      if (result.breakdown) {
+        tripPlan.budgetSummary = {
+          totalBudget: result.totalBudget as BudgetSummary["totalBudget"],
+          breakdown: result.breakdown as BudgetSummary["breakdown"],
+          totalSpent: result.totalEstimated as BudgetSummary["totalSpent"],
+          remaining: result.remaining as BudgetSummary["remaining"],
+          perPersonPerDay: result.perPersonPerDay as BudgetSummary["perPersonPerDay"],
+          label: result.label as BudgetSummary["label"],
+        };
+      }
+      break;
+    default:
+      break;
+  }
+
+  const mapPins = extractMapPins(session, tripPlan);
+
+  return {
+    ...session,
+    tripPlan: {
+      ...tripPlan,
+      mapPins,
+      updatedAt: now,
+      status: tripPlan.status === "complete" ? "complete" : "modified",
+    },
+    updatedAt: now,
+  };
 }

@@ -8,6 +8,9 @@ import {
   hotelBookingError,
   hotelBookingLoading,
 } from "../features/Hotel/hotelBooking";
+import { selectAiHotel, setTripContext } from "../features/AIChat/aiBookingSlice";
+import { hotelOfferFromLegacy } from "../Utils/liveOfferBooking";
+import { API_BASE_URL } from "../config/api";
 import { useDispatch } from "react-redux";
 
 const Card = ({
@@ -19,22 +22,34 @@ const Card = ({
   name,
   price,
   ratings,
+  liveOffer,
+  offerSnapshot,
+  label,
 }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const getSingleHotel = (id) => {
+    if (liveOffer) {
+      dispatch(setTripContext({ source: "legacy_search", dataLabel: label }));
+      dispatch(selectAiHotel(hotelOfferFromLegacy({
+        _id, offerSnapshot, name, price, ratings, location, label,
+      })));
+      navigate("/ai-travel/book");
+      return;
+    }
+
     dispatch(hotelBookingLoading());
-    fetch(`http://localhost:8080/hotels/${id}`)
+    fetch(`${API_BASE_URL}/hotels/${id}`)
       .then((r) => r.json())
       .then((r) => {
         dispatch(addHotelBooking(r.data));
-        console.log(r.data);
       })
-      .catch((e) => dispatch(hotelBookingError()));
+      .catch(() => dispatch(hotelBookingError()));
     setTimeout(() => {
       navigate(`/hotels/${_id}`);
     }, 1000);
   };
-  const navigate = useNavigate();
   return (
     <>
       <div>
@@ -49,9 +64,9 @@ const Card = ({
             </div>
 
             <div className={style_c.smallimg}>
-              <img src={extraimageUrl[0]} alt="not found" />
-              <img src={extraimageUrl[1]} alt="not found" />
-              <img src={extraimageUrl[2]} alt="not found" />
+              {(extraimageUrl || []).slice(0, 3).map((url, i) => (
+                <img key={i} src={url} alt="not found" />
+              ))}
             </div>
           </div>
 

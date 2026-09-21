@@ -6,15 +6,30 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
 
-let twilioClient = null;
-if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+function createTwilioClient() {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const apiKeySid = process.env.TWILIO_API_KEY_SID;
+  const apiKeySecret = process.env.TWILIO_API_KEY_SECRET;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  if (!accountSid) return null;
+
   try {
     const twilio = require("twilio");
-    twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-  } catch (e) {
-    twilioClient = null;
+    // Prefer API Key auth (SK... + secret from Twilio Console)
+    if (apiKeySid && apiKeySecret) {
+      return twilio(apiKeySid, apiKeySecret, { accountSid });
+    }
+    if (authToken) {
+      return twilio(accountSid, authToken);
+    }
+    return null;
+  } catch {
+    return null;
   }
 }
+
+const twilioClient = createTwilioClient();
 
 const REFRESH_TOKEN_SECRET =
   process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET_KEY;

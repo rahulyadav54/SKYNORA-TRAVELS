@@ -64,6 +64,7 @@ const bookedFlightRoute = require("./routes/BookedFlight");
 const bookedHotelRoute = require("./routes/BookedHotel");
 const flightController = require("./controllers/flightController/flight.controller");
 const aiRoute = require("./routes/ai");
+const aiBookingRoute = require("./routes/aiBooking");
 
 app.use("/hotels", hotelController);
 app.use("/auth", authRoute);
@@ -71,6 +72,7 @@ app.use("/bookings", bookedFlightRoute);
 app.use("/bookings", bookedHotelRoute);
 app.use("/flights", flightController);
 app.use("/ai", aiRoute);
+app.use("/bookings/ai", aiBookingRoute);
 
 app.use(errorHandler);
 

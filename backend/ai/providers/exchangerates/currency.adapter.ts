@@ -24,7 +24,8 @@ export class ExchangeRatesAdapter implements CurrencyProvider {
     if (cached) {
       // Return cached result but flag it
       if ((cached as { available: true }).available) {
-        return { ...cached, label: { ...( cached as { label: Record<string, unknown> }).label, dataType: "estimated" } } as CurrencyAgentResult;
+        const hit = cached as unknown as { available: true; label: Record<string, unknown> };
+        return { ...cached, label: { ...hit.label, dataType: "estimated" } } as CurrencyAgentResult;
       }
       return cached;
     }

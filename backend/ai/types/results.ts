@@ -31,6 +31,7 @@ export interface FlightSearchResult {
     adults: number;
     cabinClass: string;
   };
+  flexibleDatesSearched?: string[];
 }
 
 export interface FlightOffer {
@@ -69,6 +70,7 @@ export interface HotelSearchResult {
     checkOut: string;
     adults: number;
   };
+  nights?: number;
 }
 
 export interface HotelOffer {
@@ -241,6 +243,7 @@ export interface ItineraryResult {
   days: ItineraryDay[];
   totalDays: number;
   totalEstimatedCost: Money;
+  optimizationNote?: string;
 }
 
 export interface ItineraryDay {

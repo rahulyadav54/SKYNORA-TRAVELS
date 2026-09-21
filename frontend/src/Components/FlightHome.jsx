@@ -33,8 +33,24 @@ const FlightHome = () => {
   const onClickNoOfPass = (val) => {
     setTravellers(val);
   };
+  const formatDate = (d) => {
+    if (!d) return "";
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+
   const handleSubmit = () => {
-    navigate("/flights");
+    if (!from || !to || !departure) {
+      alert("Please select origin, destination, and departure date.");
+      return;
+    }
+    navigate("/flights", {
+      state: {
+        origin: from,
+        destination: to,
+        departureDate: formatDate(departure),
+        adults: travellers || 1,
+      },
+    });
   };
   return (
     <div className={styles.flight_wrapper}>
@@ -81,9 +97,11 @@ const FlightHome = () => {
                     onChange={(e) => setFrom(e.target.value)}
                   >
                     <MenuItem value={"New Delhi"}>New Delhi</MenuItem>
+                    <MenuItem value={"Chennai"}>Chennai</MenuItem>
                     <MenuItem value={"Mumbai"}>Mumbai</MenuItem>
                     <MenuItem value={"Pune"}>Pune</MenuItem>
                     <MenuItem value={"Bengaluru"}>Bengaluru</MenuItem>
+                    <MenuItem value={"Seoul"}>Seoul</MenuItem>
                   </Select>
                 </FormControl>
               </div>
@@ -109,9 +127,11 @@ const FlightHome = () => {
                     onChange={(e) => setTo(e.target.value)}
                   >
                     <MenuItem value={"Bengaluru"}>Bengaluru</MenuItem>
+                    <MenuItem value={"Seoul"}>Seoul</MenuItem>
                     <MenuItem value={"Mumbai"}>Mumbai</MenuItem>
                     <MenuItem value={"Pune"}>Pune</MenuItem>
                     <MenuItem value={"New Delhi"}>New Delhi</MenuItem>
+                    <MenuItem value={"Chennai"}>Chennai</MenuItem>
                   </Select>
                 </FormControl>
               </div>

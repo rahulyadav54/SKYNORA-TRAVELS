@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const Flight = require("../../schema/flightSchema/flightSchema");
 const FlightSeatInventory = require("../../models/FlightSeatInventory");
+const { searchFlightsLive, catalogueLabel } = require("../../utils/liveSearch");
 const router = express.Router();
 
 const AIRPORT_CODE = /^[A-Z]{3}$/;
@@ -75,10 +76,70 @@ router.post("/offers", async (req, res) => {
   }
 });
 
+/**
+ * Live flight search via AI stack (Amadeus or Mock). Falls back to MongoDB catalogue.
+ */
+router.post("/search", async (req, res) => {
+  const { origin, destination, departureDate, returnDate, adults, cabinClass, maxResults, sortBy } = req.body;
+
+  try {
+    const live = await searchFlightsLive({
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      adults,
+      cabinClass,
+      maxResults,
+      sortBy,
+    });
+
+    if (live.ok && live.data.length) {
+      return res.status(200).json({
+        success: true,
+        data: live.data,
+        label: live.label,
+        source: live.source,
+        provider: live.provider,
+      });
+    }
+
+    const flights = await Flight.find();
+    const label = catalogueLabel();
+    return res.status(200).json({
+      success: true,
+      data: flights.map((f) => ({ ...f.toObject(), label })),
+      label,
+      source: "catalogue_fallback",
+      warning: live.reason || "Live search returned no results — showing catalogue flights.",
+    });
+  } catch (e) {
+    try {
+      const flights = await Flight.find();
+      const label = catalogueLabel();
+      return res.status(200).json({
+        success: true,
+        data: flights.map((f) => ({ ...f.toObject(), label })),
+        label,
+        source: "catalogue_fallback",
+        warning: e.message,
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  }
+});
+
 router.get("/", async (req, res) => {
   try {
     const flights = await Flight.find();
-    res.status(200).json({ success: true, data: flights });
+    const label = catalogueLabel();
+    res.status(200).json({
+      success: true,
+      data: flights.map((f) => ({ ...f.toObject(), label })),
+      label,
+      source: "catalogue",
+    });
   } catch (e) {
     res.status(500).json({ success: false, message: e.message });
   }

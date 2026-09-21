@@ -1,12 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { SingleFlight } from "./SingleFlight";
 import styles from "./singleflight.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { addFlights, flightError, flightLoading } from "./flightSlice";
 import { CircularProgress, Slider } from "@mui/material";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../config/api";
+
 export const Flight = () => {
+  const location = useLocation();
+  const searchParams = location.state || {};
   const [flight, setFlight] = useState([]);
+  const [dataSource, setDataSource] = useState(null);
+  const [searchWarning, setSearchWarning] = useState("");
   const [duration, setDuration] = useState(true);
   const [departure, setDeparture] = useState(true);
   const [arrival, setArrival] = useState(true);
@@ -20,18 +27,54 @@ export const Flight = () => {
     flights: state.flight.flightDetails,
   }));
   const dispatch = useDispatch();
-  const getFlight = () => {
-    console.log(stopCheck, check);
-    console.log("getFlight");
+
+  const loadCatalogue = useCallback(() => {
     dispatch(flightLoading());
-    fetch("http://localhost:8080/flights")
+    fetch(`${API_BASE_URL}/flights`)
       .then((r) => r.json())
       .then((r) => {
         dispatch(addFlights(r.data));
         setFlight(r.data);
+        setDataSource(r.source || "catalogue");
+        setSearchWarning(r.warning || "");
       })
-      .catch((e) => dispatch(flightError()));
-  };
+      .catch(() => dispatch(flightError()));
+  }, [dispatch]);
+
+  const getFlight = useCallback(() => {
+    dispatch(flightLoading());
+    const hasSearch = searchParams.origin && searchParams.destination && searchParams.departureDate;
+
+    if (hasSearch) {
+      fetch(`${API_BASE_URL}/flights/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          origin: searchParams.origin,
+          destination: searchParams.destination,
+          departureDate: searchParams.departureDate,
+          adults: searchParams.adults || 1,
+          maxResults: 12,
+          sortBy: "cheapest",
+        }),
+      })
+        .then((r) => r.json())
+        .then((r) => {
+          if (r.success) {
+            dispatch(addFlights(r.data));
+            setFlight(r.data);
+            setDataSource(r.source);
+            setSearchWarning(r.warning || "");
+          } else {
+            loadCatalogue();
+          }
+        })
+        .catch(() => loadCatalogue());
+      return;
+    }
+
+    loadCatalogue();
+  }, [dispatch, searchParams, loadCatalogue]);
 
   const sorting = (tag) => {
     if (tag === "departure") {
@@ -131,7 +174,7 @@ export const Flight = () => {
 
   useEffect(() => {
     getFlight();
-  }, []);
+  }, [getFlight]);
 
   return (
     <div>
@@ -283,7 +326,20 @@ export const Flight = () => {
 
             <div className={styles.container}>
               <div className={styles.heading}>
-                <h3>{flights && <>Flights from New Delhi to Bangalore</>}</h3>
+                <h3>
+                  {searchParams.origin && searchParams.destination
+                    ? `Flights from ${searchParams.origin} to ${searchParams.destination}`
+                    : "Flights"}
+                </h3>
+                {dataSource && (
+                  <p style={{ fontSize: "12px", color: dataSource === "catalogue_fallback" ? "#b45309" : "#0d9488", margin: "4px 0 0" }}>
+                    {dataSource === "live" || dataSource === "mock"
+                      ? `✓ Live search results (${dataSource})`
+                      : dataSource === "catalogue_fallback"
+                        ? `⚠ Showing catalogue fallback${searchWarning ? ` — ${searchWarning}` : ""}`
+                        : "Catalogue results"}
+                  </p>
+                )}
               </div>
               <div className={styles.guidelines}>
                 <img

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import HeaderP from "./HeaderP";
 
 import styleP from "./ProductPage.module.css";
@@ -9,31 +9,77 @@ import { useDispatch, useSelector } from "react-redux";
 import { addHotels, hotelError, hotelLoading } from "./hotelSlice";
 import { useState } from "react";
 import { CircularProgress } from "@mui/material";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useSearchParams } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
+
+function defaultDates() {
+  const checkIn = new Date();
+  checkIn.setDate(checkIn.getDate() + 7);
+  const checkOut = new Date(checkIn);
+  checkOut.setDate(checkOut.getDate() + 2);
+  const fmt = (d) => d.toISOString().slice(0, 10);
+  return { checkIn: fmt(checkIn), checkOut: fmt(checkOut) };
+}
+
 const ProductPage = () => {
+  const [searchParams] = useSearchParams();
   const [hotel, setHotel] = useState([]);
+  const [dataSource, setDataSource] = useState(null);
+  const [searchWarning, setSearchWarning] = useState("");
+  const [activeCity, setActiveCity] = useState(searchParams.get("city") || "Bengaluru");
   let { loading, error, hotels } = useSelector((state) => ({
     loading: state.hotel.loading,
     error: state.hotel.error,
     hotels: state.hotel.hotelDetails,
   }));
   const dispatch = useDispatch();
-  const getHotels = () => {
+
+  const loadCatalogue = useCallback(() => {
     dispatch(hotelLoading());
-    fetch("http://localhost:8080/hotels")
+    fetch(`${API_BASE_URL}/hotels`)
       .then((r) => r.json())
       .then((r) => {
         dispatch(addHotels(r.data));
         setHotel(r.data);
+        setDataSource(r.source || "catalogue");
+        setSearchWarning(r.warning || "");
       })
-      .catch((e) => dispatch(hotelError()));
-  };
+      .catch(() => dispatch(hotelError()));
+  }, [dispatch]);
+
+  const searchHotels = useCallback((city) => {
+    dispatch(hotelLoading());
+    const dates = defaultDates();
+    const checkIn = searchParams.get("checkIn") || dates.checkIn;
+    const checkOut = searchParams.get("checkOut") || dates.checkOut;
+
+    fetch(`${API_BASE_URL}/hotels/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ city, checkIn, checkOut, adults: 1, rooms: 1, maxResults: 12 }),
+    })
+      .then((r) => r.json())
+      .then((r) => {
+        if (r.success) {
+          dispatch(addHotels(r.data));
+          setHotel(r.data);
+          setDataSource(r.source);
+          setSearchWarning(r.warning || "");
+        } else {
+          loadCatalogue();
+        }
+      })
+      .catch(() => loadCatalogue());
+  }, [dispatch, searchParams, loadCatalogue]);
+
+  const getHotels = useCallback(() => {
+    searchHotels(activeCity);
+  }, [searchHotels, activeCity]);
+
   const handleFilter = (tag) => {
-    if (tag === "Delhi") {
-      tag = "New Delhi";
-    }
-    const filteredHotel = hotel.filter((item) => item.location === tag);
-    setHotel(filteredHotel);
+    if (tag === "Delhi") tag = "New Delhi";
+    setActiveCity(tag);
+    searchHotels(tag);
   };
   const handlePriceFilter = (name) => {
     console.log(name);
@@ -59,7 +105,7 @@ const ProductPage = () => {
   };
   useEffect(() => {
     getHotels();
-  }, []);
+  }, [getHotels]);
   return (
     <>
       {loading ? (
@@ -72,6 +118,15 @@ const ProductPage = () => {
         <>
           <div className={styleP.BigContainer}>
             <HeaderP />
+            {dataSource && (
+              <div style={{ padding: "8px 16px", fontSize: "13px", color: dataSource === "catalogue_fallback" ? "#b45309" : "#0d9488" }}>
+                {dataSource === "live" || dataSource === "mock"
+                  ? `✓ Live hotel search — ${activeCity} (${dataSource})`
+                  : dataSource === "catalogue_fallback"
+                    ? `⚠ Catalogue fallback for ${activeCity}${searchWarning ? ` — ${searchWarning}` : ""}`
+                    : `Showing catalogue hotels`}
+              </div>
+            )}
             <div className={styleP.All_product}>
               <>
                 <div className={stylef.Fcontainer}>

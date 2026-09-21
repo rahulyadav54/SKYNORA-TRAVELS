@@ -7,6 +7,9 @@ import {
   flightBookingError,
   flightBookingLoading,
 } from "../flightBookingComponents/flightBookingSlice";
+import { selectAiFlight, setTripContext } from "../AIChat/aiBookingSlice";
+import { flightOfferFromLegacy } from "../../Utils/liveOfferBooking";
+import { API_BASE_URL } from "../../config/api";
 import { useDispatch } from "react-redux";
 export const SingleFlight = ({
   arrival,
@@ -18,11 +21,23 @@ export const SingleFlight = ({
   name,
   stops,
   _id,
+  liveOffer,
+  offerSnapshot,
+  label,
 }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const handlePageChange = (id) => {
+    if (liveOffer) {
+      dispatch(setTripContext({ source: "legacy_search", dataLabel: label }));
+      dispatch(selectAiFlight(flightOfferFromLegacy({ _id, offerSnapshot, name, fare, label, departure, arrival, stops })));
+      navigate("/ai-travel/book");
+      return;
+    }
+
     dispatch(flightBookingLoading());
-    fetch(`http://localhost:8080/flights/${id}`)
+    fetch(`${API_BASE_URL}/flights/${id}`)
       .then((r) => r.json())
       .then((r) => {
         dispatch(addBookingFlights(r.data));
@@ -33,7 +48,6 @@ export const SingleFlight = ({
       });
     navigate(`/flightBooking/${id}`);
   };
-  const navigate = useNavigate();
   return (
     <div className={styles.singleflight} key={_id}>
       <div

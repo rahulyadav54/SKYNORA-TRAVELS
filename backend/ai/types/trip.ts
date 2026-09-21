@@ -31,6 +31,18 @@ export interface TripPlan {
 
   /** Status of the plan */
   status: "planning" | "complete" | "modified" | "booked";
+
+  /** Map pins extracted from search results */
+  mapPins?: MapPin[];
+}
+
+export interface MapPin {
+  id: string;
+  name: string;
+  type: "hotel" | "attraction" | "restaurant" | "user";
+  latitude: number;
+  longitude: number;
+  address?: string;
 }
 
 /** All constraints extracted from the user's conversation */
@@ -50,6 +62,7 @@ export interface Constraint {
   transportPreferences?: string[];  // e.g. ["public_transport", "no_flights"]
   interests?: string[];              // e.g. ["temples", "street_food", "hiking"]
   travelStyle?: "budget" | "moderate" | "luxury";
+  userLocation?: { lat: number; lng: number; label?: string };
 }
 
 /** A monetary value with mandatory currency code */

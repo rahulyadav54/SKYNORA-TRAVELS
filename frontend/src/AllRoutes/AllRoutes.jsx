@@ -11,6 +11,9 @@ import { Trips } from "../features/Trips/Trips";
 import ProductPage from "../HotelsSecondPage/ProductPage";
 import Review from "../ReviewBooking/Review";
 import { AIChat } from "../features/AIChat/AIChat";
+import { AiBookingReview } from "../features/AIChat/AiBookingReview";
+import { AiBookingPayment } from "../features/AIChat/AiBookingPayment";
+import { RequireAuth } from "../Components/RequireAuth";
 
 export const AllRoutes = () => {
   return (
@@ -25,7 +28,9 @@ export const AllRoutes = () => {
       <Route path="/hotels/:id" element={<Hotel />} />
       <Route path="/hotels" element={<ProductPage />} />
       <Route path="/hotels/review/:id" element={<Review />} />
-      <Route path="/ai-travel" element={<AIChat />} />
+      <Route path="/ai-travel" element={<RequireAuth><AIChat /></RequireAuth>} />
+      <Route path="/ai-travel/book" element={<RequireAuth><AiBookingReview /></RequireAuth>} />
+      <Route path="/ai-travel/book/payment/:price" element={<RequireAuth><AiBookingPayment /></RequireAuth>} />
     </Routes>
   );
 };
